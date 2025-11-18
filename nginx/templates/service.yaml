@@ -1,9 +1,9 @@
 apiVersion: v1
-kind: service
+kind: Service
 metadata:
-  name: {{ include "my-nginx.fullname" . }}-service
+  name: {{ include "nginx-app.fullname" . }}-service
   labels:
-    {{- include "my-nginx.labels" . | nindent 4 }}
+    {{- include "nginx-app.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -11,4 +11,4 @@ spec:
       targetPort: {{ .Values.service.targetPort }}
       nodePort: {{ .Values.service.nodePort }}
   selector:
-    {{- include "my-nginx.selectorLabels" . | nindent 4 }}
+    {{- include "nginx-app.selector" . | nindent 4 }}

@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "nginx-app.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.deployment.replicas }}
+  replicas: {{ .Values.deployment.replicas }} #Replica count must be configurable.
   selector:
     matchLabels:
       {{- include "nginx-app.selector" . | nindent 6 }}
@@ -30,16 +30,16 @@ spec:
         - name: nginx-config
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
-        - name: nginx-config
-          mountPath: /usr/share/nginx/html/index.html
-          subPath: index.html
         - name: nginx-secret
           mountPath: /etc/secret-volume
           readOnly: true
         - name: nginx-pvc
           mountPath: /usr/share/nginx/html
+        - name: nginx-config
+          mountPath: /usr/share/nginx/html/index.html
+          subPath: index.html
       volumes:
-      - name: nginx-config
+      - name: nginx-config # Mount ConfigMap and Secret as volumes.
         configMap:
           name: {{include "nginx-app.fullname" . }}-configmap
           optional: false
@@ -48,7 +48,7 @@ spec:
             path: nginx.conf
           - key: index.html
             path: index.html
-      - name: nginx-secret
+      - name: nginx-secret # Mount ConfigMap and Secret as volumes.
         secret:
           secretName: {{include "nginx-app.fullname" . }}-secret
           optional: false
