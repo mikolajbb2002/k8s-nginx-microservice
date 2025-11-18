@@ -6,6 +6,12 @@
 helm install nginx nginx/ -n nginx-ns --create-namespace
 ```
 
+## To show service url 
+
+```bash 
+minikube service nginx-my-nginx-service -n nginx-ns --url
+```
+
 ## HPA testing
 
 1. Enable HPA in `nginx/values.yaml`:
@@ -21,12 +27,13 @@ hpa:
 helm upgrade nginx nginx/ -n nginx-ns
 ```
 
-3. Create a deployment that generates load for the service:
+3. Create a deployment that generates load for the service (credentials come from shell variables so they are not hardcoded in the command):
 
 ```bash
+
 kubectl create deployment load-generator -n nginx-ns \
   --image=busybox \
-  -- /bin/sh -c "while true; do wget -q -O- http://admin:admin123@nginx-my-nginx-service.nginx-ns.svc.cluster.local; done"
+  -- /bin/sh -c "while true; do wget -q -O- http://<username>:<password>@nginx-my-nginx-service.nginx-ns.svc.cluster.local; done"
 ```
 
 4. (Optional) Increase the load by scaling the deployment:
