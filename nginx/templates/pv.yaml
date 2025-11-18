@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "nginx-app.fullname" . }}-pv
+  labels:
+    {{- include "nginx-app.labels" . | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.persistentVolume.storageClassName }}
+  capacity:
+    storage: {{ .Values.persistentVolume.size }}
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /tmp/data
+  persistentVolumeReclaimPolicy: Delete
