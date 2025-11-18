@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "nginx-app.fullname" . }}-deployment
+  labels:
+    {{- include "nginx-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.deployment.replicas }} #Replica count must be configurable.
+  selector:
+    matchLabels:
+      {{- include "nginx-app.selector" . | nindent 6 }}
+  template: 
+    metadata:
+      labels:
+        {{- include "nginx-app.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ .Values.deployment.name }}
+        image: {{ .Values.deployment.image }}
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "100Mi"
+          limits:
+            cpu: "500m"
+            memory: "500Mi"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 5
+        startupProbe:
+          httpGet:
+            path: /healthz
+            port: 80
+          failureThreshold: 30
+          periodSeconds: 10
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: nginx-secret
+          mountPath: /etc/secret-volume
+          readOnly: true
+        - name: nginx-pvc
+          mountPath: /usr/share/nginx/html
+        - name: nginx-config
+          mountPath: /usr/share/nginx/html/index.html
+          subPath: index.html
+      volumes:
+      - name: nginx-config # Mount ConfigMap and Secret as volumes.
+        configMap:
+          name: {{include "nginx-app.fullname" . }}-configmap
+          optional: false
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+          - key: index.html
+            path: index.html
+      - name: nginx-secret # Mount ConfigMap and Secret as volumes.
+        secret:
+          secretName: {{include "nginx-app.fullname" . }}-secret
+          optional: false
+          items:
+          - key: USERNAME
+            path: USERNAME
+          - key: PASSWORD
+            path: PASSWORD
+          - key: .htpasswd
+            path: .htpasswd
+      - name: nginx-pvc
+        persistentVolumeClaim:
+          claimName: {{include "nginx-app.fullname" . }}-pvc

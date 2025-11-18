@@ -1,0 +1,27 @@
+environment: dev
+  
+service:
+  type: LoadBalancer
+  port: 80
+  targetPort: 80
+  nodePort: 30080
+
+deployment:
+  replicas: 1
+  name: nginx
+  image: nginx:1.14.2 
+
+secret:
+  username: admin
+  password: admin123
+  htpasswd: "admin:$apr1$P.w1basQ$QuO5LDGJtfaqGhu7iSnJf1"
+
+persistentVolume:
+  storageClassName: nginx-storage
+  size: 1Gi
+
+hpa:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 50
