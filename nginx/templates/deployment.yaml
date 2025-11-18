@@ -1,78 +1,64 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "my-nginx.fullname" . }}
+  name: {{ include "nginx-app.fullname" . }}-deployment
   labels:
-    {{- include "my-nginx.labels" . | nindent 4 }}
+    {{- include "nginx-app.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
-      {{- include "my-nginx.selectorLabels" . | nindent 6 }}
-  template:
+      {{- include "nginx-app.selector" . | nindent 6 }}
+  template: 
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
-        {{- include "my-nginx.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{- include "nginx-app.labels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "my-nginx.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          {{- with .Values.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          {{- with .Values.livenessProbe }}
-          livenessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.readinessProbe }}
-          readinessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.resources }}
-          resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.volumes }}
+      - name: {{ .Values.deployment.name }}
+        image: {{ .Values.deployment.image }}
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "100Mi"
+          limits:
+            cpu: "500m"
+            memory: "500Mi"
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        - name: nginx-config
+          mountPath: /usr/share/nginx/html/index.html
+          subPath: index.html
+        - name: nginx-secret
+          mountPath: /etc/secret-volume
+          readOnly: true
+        - name: nginx-pvc
+          mountPath: /usr/share/nginx/html
       volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      - name: nginx-config
+        configMap:
+          name: {{include "nginx-app.fullname" . }}-configmap
+          optional: false
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+          - key: index.html
+            path: index.html
+      - name: nginx-secret
+        secret:
+          secretName: {{include "nginx-app.fullname" . }}-secret
+          optional: false
+          items:
+          - key: USERNAME
+            path: USERNAME
+          - key: PASSWORD
+            path: PASSWORD
+          - key: .htpasswd
+            path: .htpasswd
+      - name: nginx-pvc
+        persistentVolumeClaim:
+          claimName: {{include "nginx-app.fullname" . }}-pvc
