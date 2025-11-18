@@ -1,5 +1,5 @@
 apiVersion: v2
-name: my-nginx
+name: nginx
 description: A Helm chart for Kubernetes nginx 
 type: application
 version: 0.1.0
