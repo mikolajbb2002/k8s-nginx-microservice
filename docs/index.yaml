@@ -3,12 +3,12 @@ entries:
   my-nginx:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-11-18T15:34:49.616664+01:00"
+    created: "2025-11-18T15:41:32.759221+01:00"
     description: A Helm chart for Kubernetes nginx
     digest: 92d2afb139e1bc344b80a7767a867940b3ad8a5e86b78d1b555d8ec6d2c10570
     name: my-nginx
     type: application
     urls:
-    - https://mikolajbb2002.github.io/k8s-nginx/my-nginx-0.1.0.tgz
+    - https://mikolajbb2002.github.io/k8s-nginx-microservice/my-nginx-0.1.0.tgz
     version: 0.1.0
-generated: "2025-11-18T15:34:49.615629+01:00"
+generated: "2025-11-18T15:41:32.758766+01:00"
