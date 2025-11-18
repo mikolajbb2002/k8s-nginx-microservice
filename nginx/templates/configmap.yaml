@@ -16,6 +16,9 @@ data:
                 root /usr/share/nginx/html;
                 index index.html index.htm;
             }
+            location /healthz { 
+                return 200;
+            }
         }
     }
   index.html: |
