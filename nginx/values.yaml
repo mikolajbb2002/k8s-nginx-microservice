@@ -41,13 +41,16 @@ secret:
   htpasswd: "admin:$apr1$P.w1basQ$QuO5LDGJtfaqGhu7iSnJf1"
 
 persistentVolume:
-  storageClassName: nginx-storage
+  storageClassName: standard
   size: 1Gi
   accessModes:
     - ReadWriteOnce
-  hostPath:
-    path: /tmp/data
-  reclaimPolicy: Delete
+
+storageClass:
+  enabled: false
+  provisioner: kubernetes.io/no-provisioner
+  volumeBindingMode: WaitForFirstConsumer
+  allowVolumeExpansion: false
 
 hpa:
   enabled: false
