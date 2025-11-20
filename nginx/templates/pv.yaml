@@ -9,7 +9,9 @@ spec:
   capacity:
     storage: {{ .Values.persistentVolume.size }}
   accessModes:
-    - ReadWriteOnce
+  {{- range .Values.persistentVolume.accessModes }}
+    - {{ . }}
+  {{- end }}
   hostPath:
-    path: /tmp/data
-  persistentVolumeReclaimPolicy: Delete
+    path: {{ .Values.persistentVolume.hostPath.path }}
+  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.reclaimPolicy }}

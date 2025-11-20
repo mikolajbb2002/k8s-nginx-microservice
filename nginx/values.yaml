@@ -9,7 +9,31 @@ service:
 deployment:
   replicas: 1
   name: nginx
-  image: nginx:1.14.2 
+  image: nginx:1.14.2
+  containerPort: 80
+  resources:
+    requests:
+      cpu: "50m"
+      memory: "100Mi"
+    limits:
+      cpu: "500m"
+      memory: "500Mi"
+  probes:
+    liveness:
+      path: /healthz
+      port: 80
+      initialDelaySeconds: 3
+      periodSeconds: 10
+    readiness:
+      path: /healthz
+      port: 80
+      initialDelaySeconds: 15
+      periodSeconds: 5
+    startup:
+      path: /healthz
+      port: 80
+      failureThreshold: 30
+      periodSeconds: 10
 
 secret:
   username: admin
@@ -19,9 +43,19 @@ secret:
 persistentVolume:
   storageClassName: nginx-storage
   size: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /tmp/data
+  reclaimPolicy: Delete
 
 hpa:
   enabled: false
   minReplicas: 2
   maxReplicas: 5
   targetCPUUtilizationPercentage: 50
+  metrics:
+    type: Resource
+    resource:
+      name: cpu
+      targetType: Utilization
