@@ -6,6 +6,11 @@
 helm install nginx nginx/ -n nginx-ns --create-namespace
 ```
 
+## To set namespace as default 
+
+```bash
+kubectl config set-context --current --namespace=nginx-ns
+```
 ## To show service url 
 
 ```bash 
