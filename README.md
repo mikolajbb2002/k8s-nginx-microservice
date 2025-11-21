@@ -106,3 +106,4 @@ If you want to define your own StorageClass via this chart (for another cluster)
      volumeBindingMode: WaitForFirstConsumer
      allowVolumeExpansion: false
    ```
+  

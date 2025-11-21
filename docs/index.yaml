@@ -3,12 +3,12 @@ entries:
   nginx-k8s:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-11-20T15:27:15.777012+01:00"
+    created: "2025-11-21T09:54:46.078293+01:00"
     description: A Helm chart for Kubernetes nginx
-    digest: 2e3f8a2a9e49fe36579388654f8ae388ad0c1ab3bd8a12708cc28ec79f2a6183
+    digest: 9549bbcb230398e344c697fc74d668e26bc488e8350c82161521e4935cddf36a
     name: nginx-k8s
     type: application
     urls:
     - https://mikolajbb2002.github.io/k8s-nginx-microservice/nginx-k8s-0.2.0.tgz
     version: 0.2.0
-generated: "2025-11-20T15:27:15.775828+01:00"
+generated: "2025-11-21T09:54:46.077322+01:00"
