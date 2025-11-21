@@ -7,7 +7,7 @@ service:
   nodePort: 30080
 
 deployment:
-  replicas: 1
+  replicas: 2
   name: nginx
   image: nginx:1.14.2
   containerPort: 80

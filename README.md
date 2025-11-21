@@ -9,15 +9,23 @@ It includes HPA, liveness/readiness/startup probes and Persistent Volume Claim u
 - Quick check in the browser if repo is available:  
   `https://mikolajbb2002.github.io/k8s-nginx-microservice/index.yaml`
 
-- Add the repo to your cluster:
+In the empty directory: 
+- Add the repo and refresh the index:
+  ```bash
+  helm repo add my-nginx https://mikolajbb2002.github.io/k8s-nginx-microservice
+  helm repo update
+  ```
 
-```bash
-helm repo add my-nginx https://mikolajbb2002.github.io/k8s-nginx-microservice
-helm repo update
-```
+- Download the published artefact:
+  ```bash
+  helm pull my-nginx/nginx-k8s --version 0.2.0
+  ```
 
----
-
+- Install from the package:
+  ```bash
+  helm install nginx ./nginx-k8s-0.2.0.tgz -n nginx-ns --create-namespace
+  ```
+ 
 ## Install the chart
 
 Create the namespace and install the release:
@@ -107,3 +115,45 @@ If you want to define your own StorageClass via this chart (for another cluster)
      allowVolumeExpansion: false
    ```
   
+
+  ## ArgoCD
+
+1. Create namespace for ArgoCD 
+
+```bash
+kubectl create namespace argocd
+```
+2. Install Argo CD 
+
+```bash
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+3. Download Argo CD CLI
+
+```bash
+brew install argocd
+```
+
+4. Apply custom manifest with Helm Chart Repo url
+
+```bash
+kubectl apply -f argo/application-nginx.yaml -n argocd
+```
+
+5. Sync app 
+
+```bash
+argocd app sync nginx-app.
+```
+
+6. To get password, login is admin
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+```
+
+7. To get on localhost
+```bash
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+```
+
